@@ -226,7 +226,7 @@ internal static readonly delegate* unmanaged[Cdecl]<nint, FfiReadOnlySlice, nint
 
 One downside: binding by symbol name at type initialization is how open bug B1 shows up. A long-lived rust-analyzer process can write a stale manifest that still lists a deleted export, and then `NativeMethods` throws `TypeInitializationException` the first time it's used. The workaround is a fresh `cargo build`.
 
-<!-- TODO: comparison section -->
+<!-- TODO: comparison section. Use the table in README.md ("How it compares"); do not claim to be first. -->
 
 ## Numbers and limits
 
