@@ -1,0 +1,3 @@
+<Project>
+  <Import Project="../build/TokioDotnet.Generator.targets" />
+</Project>

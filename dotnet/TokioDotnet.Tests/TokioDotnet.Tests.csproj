@@ -9,6 +9,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <!-- Bindings manifest + native library from the release cargo build (see TokioDotnet.Generator.targets). -->
+    <TokioDotnetCargoTargetDir>../../target</TokioDotnetCargoTargetDir>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
@@ -19,7 +21,6 @@
   <ItemGroup>
     <ProjectReference Include="../TokioDotnet.Runtime/TokioDotnet.Runtime.csproj" />
     <ProjectReference Include="../TokioDotnet.Generator/TokioDotnet.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
-    <!-- Schema emitted by #[dotnet_export] during `cargo build`. -->
-    <AdditionalFiles Include="../../target/tokio-dotnet-bindings.json" />
   </ItemGroup>
+  <Import Project="../TokioDotnet.Generator/build/TokioDotnet.Generator.targets" />
 </Project>

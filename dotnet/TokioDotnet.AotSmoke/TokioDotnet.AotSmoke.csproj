@@ -11,10 +11,12 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <!-- NuGet audit advisories on the SDK-pinned ILCompiler stay visible as warnings (fix: update the .NET SDK). -->
     <WarningsNotAsErrors>NU1901;NU1902;NU1903;NU1904</WarningsNotAsErrors>
+    <!-- Bindings manifest + native library from the release cargo build (see TokioDotnet.Generator.targets). -->
+    <TokioDotnetCargoTargetDir>../../target</TokioDotnetCargoTargetDir>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../TokioDotnet.Runtime/TokioDotnet.Runtime.csproj" />
     <ProjectReference Include="../TokioDotnet.Generator/TokioDotnet.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
-    <AdditionalFiles Include="../../target/tokio-dotnet-bindings.json" />
   </ItemGroup>
+  <Import Project="../TokioDotnet.Generator/build/TokioDotnet.Generator.targets" />
 </Project>

@@ -8,7 +8,27 @@
     <!-- RS2008: release tracking is for shipped analyzer packages. -->
     <NoWarn>$(NoWarn);RS2008</NoWarn>
   </PropertyGroup>
+  <PropertyGroup>
+    <!-- Analyzer-only package: no lib/ reference, no dependencies. -->
+    <PackageId>TokioDotnet.Generator</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>redd34</Authors>
+    <Description>Roslyn source generator for tokio-dotnet: turns the #[dotnet_export] bindings manifest into C# bindings, and copies the Rust native library to the output. Set TokioDotnetCargoTargetDir to your cargo target directory. Pair with TokioDotnet.Runtime.</Description>
+    <PackageLicenseExpression>MIT OR Apache-2.0</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/redd34/rustify</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/redd34/rustify</PackageProjectUrl>
+    <PackageTags>rust;tokio;ffi;interop;async;nativeaot;source-generator</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <DevelopmentDependency>true</DevelopmentDependency>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.8.0" PrivateAssets="all" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="../../README.md" Pack="true" PackagePath="/" Visible="false" />
+    <None Include="$(OutputPath)$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <None Update="build/**;buildTransitive/**" Pack="true" PackagePath="%(Identity)" />
   </ItemGroup>
 </Project>
