@@ -1,0 +1,5 @@
+target/
+bin/
+obj/
+BenchmarkDotNet.Artifacts/
+.DS_Store

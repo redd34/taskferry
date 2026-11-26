@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="TokioDotnet.Runtime/TokioDotnet.Runtime.csproj" />
+  <Project Path="TokioDotnet.Generator/TokioDotnet.Generator.csproj" />
+  <Project Path="TokioDotnet.Tests/TokioDotnet.Tests.csproj" />
+  <Project Path="TokioDotnet.AotSmoke/TokioDotnet.AotSmoke.csproj" />
+</Solution>

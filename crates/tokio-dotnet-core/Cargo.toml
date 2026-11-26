@@ -1,0 +1,10 @@
+[package]
+name = "tokio-dotnet-core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+tokio.workspace = true
+tokio-util.workspace = true
+futures.workspace = true
