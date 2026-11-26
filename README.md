@@ -1,7 +1,10 @@
 # tokio-dotnet
 
-A zero-copy, NativeAOT-compatible bridge between **async Rust** (Tokio futures and
-`futures::Stream`) and **modern .NET** (`Task<T>`, `IAsyncEnumerable<T>`, `Memory<T>`).
+[![CI](https://github.com/redd34/rustify/actions/workflows/ci.yml/badge.svg)](https://github.com/redd34/rustify/actions/workflows/ci.yml)
+
+**Call async Rust from C#.** A zero-copy, NativeAOT-compatible Rust/.NET interop bridge that turns
+Tokio futures into `Task<T>` and a Rust `Stream` into `IAsyncEnumerable<T>`, with
+`CancellationToken` support and `Memory<T>` buffers that are never copied.
 
 Annotate Rust with `#[dotnet_export]`; a Roslyn source generator emits the C# bindings at
 compile time. No hand-written P/Invoke, no serialization, no runtime reflection.
@@ -177,6 +180,8 @@ crate as a `cdylib`, then in your `.csproj` reference `TokioDotnet.Runtime`, add
 is a working template. The generated namespace is the cdylib name in PascalCase.
 
 ## License
+
+This is an independent project and is not affiliated with or endorsed by the Tokio project or Microsoft.
 
 Licensed under either of [Apache License, Version 2.0](LICENSE-APACHE) or
 [MIT license](LICENSE-MIT) at your option.

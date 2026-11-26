@@ -6,6 +6,11 @@ members = ["crates/*"]
 version = "0.1.0"
 edition = "2021"
 license = "MIT OR Apache-2.0"
+repository = "https://github.com/redd34/rustify"
+homepage = "https://github.com/redd34/rustify"
+readme = "README.md"
+keywords = ["dotnet", "csharp", "ffi", "tokio", "async"]
+categories = ["development-tools::ffi", "asynchronous"]
 
 [workspace.dependencies]
 tokio = { version = "1", features = ["rt-multi-thread", "sync", "time", "macros"] }
