@@ -5,7 +5,7 @@ namespace TokioDotnet.Runtime;
 /// <summary>
 /// Pull-based cursor over a Rust <c>Stream</c>. Each <see cref="MoveNextAsync"/> asks Rust
 /// for exactly one item (backpressure); <see cref="DisposeAsync"/> drops the Rust stream
-/// immediately. Allocation-free per item (reusable <see cref="IValueTaskSource{T}"/>).
+/// immediately. No <see cref="Task"/> is allocated per item (reusable <see cref="IValueTaskSource{T}"/>).
 /// Like any enumerator, it must not be used concurrently.
 /// </summary>
 public sealed unsafe class RustAsyncEnumerator<TNative, T, TConv> : RustCallContext, IAsyncEnumerator<T>, IValueTaskSource<bool>
