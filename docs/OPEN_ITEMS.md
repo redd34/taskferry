@@ -1,7 +1,7 @@
 # Open work items
 
 Status of the four phases and the deliberate deviations from the original spec are in the
-`## Status` section of [CLAUDE.md](../CLAUDE.md). Known defects are in [BUGS.md](BUGS.md).
+`## Status` section of [CLAUDE.md](../CLAUDE.md). Known defects are in [BUGS.md](BUGS.md); what has been tested is in [TESTING.md](TESTING.md).
 
 ## Verification gaps
 
@@ -39,8 +39,6 @@ Status of the four phases and the deliberate deviations from the original spec a
   an MSBuild target that adds the manifest to `AdditionalFiles` and copies the native library
   (today each consumer `.csproj` does this by hand and `verify.sh` copies the cdylib).
 - **P2 — crates.io.** Publish `tokio-dotnet-core` and `tokio-dotnet-macros`; add crate metadata.
-- **P3 — README and LICENSE files.** The workspace declares `MIT OR Apache-2.0` but ships no
-  license texts or user-facing README.
 - **P4 — `tokenizers` 1.0.** The example pins `tokenizers` 0.21; a 1.0 release candidate exists.
 - **P5 — Benchmark baseline.** `FfiBenchmarks.MarshalledByteArray` simulates copy-in/copy-out
   marshalling rather than using a real marshalled P/Invoke.
