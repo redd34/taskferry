@@ -51,7 +51,7 @@ await foreach (uint token in engine.StreamTokens("Hello world", cancellationToke
 flowchart LR
     subgraph Rust
         A["#[dotnet_export]<br/>struct + impl"] --> B["tokio-dotnet-macros"]
-        B --> C["extern &quot;C&quot; shims<br/>in your cdylib"]
+        B --> C["extern C shims<br/>in your cdylib"]
         B --> D["target/tokio-dotnet-bindings.json"]
         C --> E["tokio-dotnet-core<br/>runtime, task + stream bridges"]
     end
