@@ -4,5 +4,5 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 cargo build --release --workspace
-dotnet build dotnet/TokioDotnet.Tests -c Release --nologo -v quiet   # also copies the native library
-dotnet dotnet/TokioDotnet.Tests/bin/Release/net9.0/TokioDotnet.Tests.dll --filter '*' "$@"
+dotnet build dotnet/Taskferry.Tests -c Release --nologo -v quiet   # also copies the native library
+dotnet dotnet/Taskferry.Tests/bin/Release/net9.0/Taskferry.Tests.dll --filter '*' "$@"

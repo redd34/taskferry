@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
 # Full Rust + C# build, tests, and the NativeAOT gate.
-# The native library is copied by dotnet/TokioDotnet.Generator/build/TokioDotnet.Generator.targets.
+# The native library is copied by dotnet/Taskferry.Generator/build/Taskferry.Generator.targets.
 # SKIP_AOT=1 skips the (slow) NativeAOT publish.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
 echo "==> cargo build + test"
-cargo build --release --workspace   # also emits target/tokio-dotnet-bindings.json
+cargo build --release --workspace   # also emits target/taskferry-bindings.json
 cargo test --release --workspace
 
 echo "==> dotnet build + test"
-dotnet build dotnet/TokioDotnet.slnx -c Release --nologo -v quiet
-dotnet test dotnet/TokioDotnet.Tests -c Release --no-build --nologo
+dotnet build dotnet/Taskferry.slnx -c Release --nologo -v quiet
+dotnet test dotnet/Taskferry.Tests -c Release --no-build --nologo
 
 echo "==> quick-start sample"
 dotnet run --project samples/QuickStart -c Release --no-build
@@ -30,8 +30,8 @@ if [ "${SKIP_AOT:-0}" != 1 ]; then
     *) ARCH=x64 ;;
   esac
   AOT_OUT=target/aot-smoke
-  dotnet publish dotnet/TokioDotnet.AotSmoke -c Release -r "$RID_OS-$ARCH" -o "$AOT_OUT" --nologo -v quiet
-  "$AOT_OUT/TokioDotnet.AotSmoke"
+  dotnet publish dotnet/Taskferry.AotSmoke -c Release -r "$RID_OS-$ARCH" -o "$AOT_OUT" --nologo -v quiet
+  "$AOT_OUT/Taskferry.AotSmoke"
 fi
 
 echo "==> verify OK"

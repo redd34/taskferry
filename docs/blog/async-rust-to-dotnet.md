@@ -4,11 +4,11 @@
 
 Suppose you have a Rust library built on Tokio and you want to call it from .NET. The synchronous part is easy: `extern "C"`, a blittable struct or two, done. The async part is where it gets hard. You want `await engine.EncodeAsync(bytes)` to give you a real `Task<T>`. You want the input buffer to go to Rust without being copied, and the `Vec<u32>` that comes back to reach C# without being copied either. And you don't want to hand-write a `GCHandle` + `TaskCompletionSource` state machine for every method.
 
-tokio-dotnet is an experimental attempt at that. You put a `#[dotnet_export]` attribute on a Rust struct and its impl block. The proc-macro generates `extern "C"` shims and writes a JSON manifest, and a Roslyn source generator reads the manifest and emits the C# classes. This post is mostly about the places where that bridge nearly went wrong, including one use-after-free that compiled without a warning.
+taskferry is an experimental attempt at that. You put a `#[dotnet_export]` attribute on a Rust struct and its impl block. The proc-macro generates `extern "C"` shims and writes a JSON manifest, and a Roslyn source generator reads the manifest and emits the C# classes. This post is mostly about the places where that bridge nearly went wrong, including one use-after-free that compiled without a warning.
 
 ## What it looks like
 
-This is the Rust side of the tokenizer example (`crates/tokio-dotnet-example/src/hf_tokenizer.rs`, trimmed):
+This is the Rust side of the tokenizer example (`crates/taskferry-example/src/hf_tokenizer.rs`, trimmed):
 
 ```rust
 #[dotnet_export]
@@ -151,7 +151,7 @@ The type comes back through the `GCHandle` target. `RustTaskContext<TNative, T, 
 
 ## Streams are pulled, not pushed
 
-A Rust stream could push every item into a .NET callback as soon as it's produced. Then a slow consumer means unbounded buffering on the .NET side. tokio-dotnet uses a pull cursor instead: each `MoveNextAsync` calls `tokio_dotnet_stream_next` once, Rust spawns one `stream.next()`, and the result comes back through the same `OnComplete` callback. The stream can't produce item N+1 until the consumer asks for it, so backpressure is built in.
+A Rust stream could push every item into a .NET callback as soon as it's produced. Then a slow consumer means unbounded buffering on the .NET side. taskferry uses a pull cursor instead: each `MoveNextAsync` calls `taskferry_stream_next` once, Rust spawns one `stream.next()`, and the result comes back through the same `OnComplete` callback. The stream can't produce item N+1 until the consumer asks for it, so backpressure is built in.
 
 On the C# side, `RustAsyncEnumerator` is itself the call context, and it implements `IValueTaskSource<bool>` over a reused `ManualResetValueTaskSourceCore<bool>`. That way a pull doesn't allocate a new `Task`:
 
@@ -164,7 +164,7 @@ public ValueTask<bool> MoveNextAsync()
 }
 ```
 
-When the consumer leaves `await foreach` early, `DisposeAsync` releases the cursor's `SafeHandle`, and `tokio_dotnet_stream_free` cancels and drops the stream right away. The exception is when a pull is still in flight: that pull holds the stream's lock, sees the cancelled token, and drops the stream itself. `EarlyBreak_DropsRustStreamWithin50ms` breaks at item 5 and requires a `Drop` counter inside the Rust stream to increment within 50 ms. In the last recorded run, the whole test took 4 ms.
+When the consumer leaves `await foreach` early, `DisposeAsync` releases the cursor's `SafeHandle`, and `taskferry_stream_free` cancels and drops the stream right away. The exception is when a pull is still in flight: that pull holds the stream's lock, sees the cancelled token, and drops the stream itself. `EarlyBreak_DropsRustStreamWithin50ms` breaks at item 5 and requires a `Drop` counter inside the Rust stream to increment within 50 ms. In the last recorded run, the whole test took 4 ms.
 
 The cost is one native round trip and one task hop per item. For fast streams that adds up, and batched pulls are listed as open work (F5).
 
@@ -247,10 +247,10 @@ Some limits matter for real use:
 - **`RustMemoryManager<T>` has no finalizer.** A `Span<T>` doesn't keep its `MemoryManager` alive, so a finalizer could free Rust memory while a span over it is still being read (CA2015). Forgetting to `Dispose` an `IMemoryOwner<T>` therefore leaks native memory instead of risking corruption (B2). `RustLibrary.LiveBuffers` reports the live count.
 - **Dropped tasks look cancelled (B3).** A `CompletionGuard` dropped without completing surfaces as `TaskCanceledException` with a default token. You can't tell it apart from real cancellation, although the docs note it isn't reachable today because the runtime never shuts down.
 - **Panics print to stderr and carry no backtrace (B4).** `RustFfiException` contains only the panic message.
-- **Overloads are rejected (B7).** Two Rust methods that map to the same C# name fail the build with `TDN001`.
+- **Overloads are rejected (B7).** Two Rust methods that map to the same C# name fail the build with `TFY001`.
 - **The supported surface is narrow:** numeric primitives, `bool`, `&[T]`, `&str`, `String`, `Vec<T>` of primitives, `Self` constructors, `RustResult<_>`, and `impl Stream<Item = RustResult<T>>`. Methods take `&self` or no receiver. There's no `Option<T>`, no user structs, no `&mut self`, and no free functions yet.
 - The generator has no unit tests of its own, several fixed bugs have no regression test, and nothing has been run under Miri or ASan yet (W4-W6).
 
 ## Try it
 
-The code is at https://github.com/redd34/rustify. **No packages are published yet**, neither on crates.io nor on NuGet. To use it today, you depend on the two crates by path, build a `cdylib`, reference `TokioDotnet.Runtime` and add `TokioDotnet.Generator` as an analyzer, add `target/tokio-dotnet-bindings.json` as `AdditionalFiles`, and copy the native library next to your output. `TokioDotnet.Tests.csproj` is a working template. `./scripts/verify.sh` runs the whole pipeline, and `docs/BUGS.md` and `docs/OPEN_ITEMS.md` list what's known to be missing or broken. Bug reports from Linux and Windows would be especially useful, since nobody has run it there.
+The code is at https://github.com/redd34/taskferry. **No packages are published yet**, neither on crates.io nor on NuGet. To use it today, you depend on the two crates by path, build a `cdylib`, reference `Taskferry.Runtime` and add `Taskferry.Generator` as an analyzer, add `target/taskferry-bindings.json` as `AdditionalFiles`, and copy the native library next to your output. `Taskferry.Tests.csproj` is a working template. `./scripts/verify.sh` runs the whole pipeline, and `docs/BUGS.md` and `docs/OPEN_ITEMS.md` list what's known to be missing or broken. Bug reports from Linux and Windows would be especially useful, since nobody has run it there.

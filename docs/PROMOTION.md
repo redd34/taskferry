@@ -11,10 +11,10 @@ Legend: ✅ done · 🟡 prepared, waiting on a decision or credential · ⬜ no
 | # | Step | Status | Notes |
 |---|---|---|---|
 | 1.1 | CI on Linux, Windows, macOS | ✅ | `.github/workflows/ci.yml` runs `scripts/verify.sh` on all three |
-| 1.2 | Crate metadata for crates.io | ✅ | `cargo publish --dry-run` passes for `tokio-dotnet-core` and `tokio-dotnet-macros` |
+| 1.2 | Crate metadata for crates.io | ✅ | `cargo publish --dry-run` passes for `taskferry-core` and `taskferry-macros` |
 | 1.3 | NuGet packages for runtime and generator | ✅ packable, not published | `dotnet pack` into `artifacts/nuget/` |
-| 1.4 | **Decide the name** | 🟡 owner decision | Repo is `rustify`, code is `tokio-dotnet`. Registry names are effectively permanent. See section 5 |
-| 1.5 | Publish to crates.io and NuGet | 🟡 needs 1.4 + API tokens | Irreversible (crates.io versions cannot be deleted); not done without explicit go-ahead |
+| 1.4 | Decide the name | ✅ | **Taskferry** (crates `taskferry-core`, `taskferry-macros`; packages `Taskferry.Runtime`, `Taskferry.Generator`). See section 5 |
+| 1.5 | Publish to crates.io and NuGet | 🟡 needs API tokens | Irreversible (crates.io versions cannot be deleted); not done without explicit go-ahead |
 
 ## 2. Make the repository findable
 
@@ -58,7 +58,7 @@ with their own rules, and should be timed for when someone can actually install 
 > the completion callback fire exactly once, and a use-after-free where an unbounded `&*ptr` let the
 > compiler infer `&'static T`. [link to post]
 >
-> Repo: https://github.com/redd34/rustify — experimental; feedback on the unsafe code very welcome.
+> Repo: https://github.com/redd34/taskferry — experimental; feedback on the unsafe code very welcome.
 
 ### Draft: Reddit (r/dotnet, r/csharp)
 
@@ -77,19 +77,22 @@ with their own rules, and should be timed for when someone can actually install 
 > First comment: what it is in two sentences, what is verified (link TESTING.md), what is not
 > (link BUGS.md), and the most interesting bug (the `'static` inference use-after-free).
 
-## 5. Name decision (needed before anything is published)
+## 5. Name decision
 
-Checked against the live registries on 2026-11-26:
+The project was renamed to **Taskferry** on 2026-11-26 (it ferries Rust work across as a .NET
+`Task`). The working name `tokio-dotnet` read as an official Tokio project and meant nothing to
+C# developers; the original repo name `rustify` was taken on both registries.
 
-| Name | crates.io | NuGet | Notes |
-|---|---|---|---|
-| `tokio-dotnet`, `-core`, `-macros` / `TokioDotnet.*` | free | free | No Tokio naming policy was found, which is not the same as permission. Reads as an official Tokio project; consider asking the Tokio maintainers first |
-| `rustify` / `Rustify` | **taken** (HTTP client, ~15M downloads) | **taken** | The GitHub repo name collides with unrelated packages on both registries |
+Availability checked against the live registries on 2026-11-26:
 
-Options: (a) keep `tokio-dotnet` and rename the GitHub repo to match; (b) pick a new neutral name
-for crates, packages and repo. Either way the repo should not stay `rustify`, because searching
-that name leads to other projects. The Rust Foundation trademark policy allows "Rust" in a name
-when it indicates compatibility but not when it could look official.
+| Name | crates.io | NuGet |
+|---|---|---|
+| `taskferry`, `taskferry-core`, `taskferry-macros` | free | — |
+| `Taskferry`, `Taskferry.Runtime`, `Taskferry.Generator` | — | free |
+| Tether (considered) | taken | taken; also a cryptocurrency brand |
+| Causeway (considered) | reserved by another project | free |
+
+Names are not reserved until something is published under them (step 1.5).
 
 ## 6. Engineering deliverables for this plan
 
@@ -97,14 +100,14 @@ when it indicates compatibility but not when it could look official.
 |---|---|---|
 | CI on Ubuntu, macOS, Windows | `.github/workflows/ci.yml` | Green on all three (tests, sample, NativeAOT) |
 | Crate metadata | `Cargo.toml`, `crates/*/Cargo.toml` | `cargo publish --dry-run` for both library crates |
-| NuGet packaging | `dotnet/TokioDotnet.Runtime`, `dotnet/TokioDotnet.Generator` (+ `build/*.targets`) | `dotnet pack`; a consumer using only the two `.nupkg` files built, ran and AOT-published on macOS |
-| One-property consumer setup | `TokioDotnetCargoTargetDir` | Used by the tests, the AOT smoke app and the sample |
+| NuGet packaging | `dotnet/Taskferry.Runtime`, `dotnet/Taskferry.Generator` (+ `build/*.targets`) | `dotnet pack`; a consumer using only the two `.nupkg` files built, ran and AOT-published on macOS |
+| One-property consumer setup | `TaskferryCargoTargetDir` | Used by the tests, the AOT smoke app and the sample |
 | Quick-start sample | `samples/QuickStart` | Run by `verify.sh` locally and in CI |
 | Comparison table | `README.md` | Sourced from the research below |
 | Blog post draft | `docs/blog/async-rust-to-dotnet.md` | Fact-checked against the code by its author; see caveat in 7.3 |
 
-To build the packages locally: `dotnet pack dotnet/TokioDotnet.Runtime -c Release -o artifacts/nuget`
-and the same for `dotnet/TokioDotnet.Generator`.
+To build the packages locally: `dotnet pack dotnet/Taskferry.Runtime -c Release -o artifacts/nuget`
+and the same for `dotnet/Taskferry.Generator`.
 
 ## 7. Research (2026-11-26)
 
@@ -168,7 +171,7 @@ driver, DataFusionSharp, LanceDB). They are the natural first users and the best
 
 ## 8. Suggested order from here
 
-1. Decide the name (section 5) and rename the repo to match.
+1. ~~Decide the name and rename the repo to match.~~ Done.
 2. Publish 0.1.0 to crates.io and NuGet (needs your API tokens and an explicit go-ahead).
 3. Rewrite the blog draft in your own voice and publish it.
 4. Post to r/rust (project flair) and r/dotnet; TWiR picks project news up from r/rust.

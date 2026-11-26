@@ -6,7 +6,7 @@ regression tests cover. Planned work lives in [OPEN_ITEMS.md](OPEN_ITEMS.md).
 ## Open
 
 ### B1 — Editor tooling can write a stale bindings manifest
-`#[dotnet_export]` rebuilds `target/tokio-dotnet-bindings.json` from the exports seen by the
+`#[dotnet_export]` rebuilds `target/taskferry-bindings.json` from the exports seen by the
 current compiler process. A long-lived proc-macro server (rust-analyzer) accumulates exports
 across edits, so after renaming or deleting an exported method it can write a manifest that
 still lists the old symbol. The C# build then fails, or `NativeMethods` throws
@@ -26,7 +26,7 @@ If a `CompletionGuard` is dropped without completing (task abort), .NET sees
 indistinguishable from a real cancellation. Not reachable today (the runtime never shuts down).
 
 ### B4 — Rust panics print to stderr and carry no stack trace
-The default panic hook still prints `thread 'tokio-dotnet' panicked at ...` for every caught
+The default panic hook still prints `thread 'taskferry' panicked at ...` for every caught
 panic, and `RustFfiException` contains only the panic message, not the location or backtrace.
 
 ### B5 — NuGet advisory on the NativeAOT compiler package
@@ -39,7 +39,7 @@ The Rust/C# struct layout parity tests are compiled only for 64-bit targets. 32-
 
 ### B7 — Overloads are rejected
 Two Rust methods that map to the same C# member name (`new` + `create`, `foo` + sync
-`foo_async`, or a method named like its struct) now fail the build with a clear `TDN001` error.
+`foo_async`, or a method named like its struct) now fail the build with a clear `TFY001` error.
 C# could express some of these as overloads; the generator does not try.
 
 ## Fixed
@@ -50,7 +50,7 @@ C# could express some of these as overloads; the generator does not try.
 | A Rust parameter named `handle` was passed as the object pointer | Generator emits `this.handle` | `SyncCalls_RoundTrip` (`Echo`) |
 | Cancelled stream ended silently instead of throwing | Cursor reports cancellation when the stream was dropped by `cancel` | `StreamCancellation_ThrowsAndDropsRustStream` |
 | Stale manifest entries survived renames until `cargo clean` | Manifest is rebuilt from the current compilation only (see B1 for the remaining editor case) | — |
-| Parameter names `ctx` / `out` / `cancellation_token` clashed with generated locals | Generator locals are prefixed `__tdn_`; the token parameter is renamed on clash | `CancellableCall_ThatCompletes_ReturnsNormally` (`EchoAsync`) |
+| Parameter names `ctx` / `out` / `cancellation_token` clashed with generated locals | Generator locals are prefixed `__tfy_`; the token parameter is renamed on clash | `CancellableCall_ThatCompletes_ReturnsNormally` (`EchoAsync`) |
 | Rust parameters named `__out`, `__state`, ... clashed with shim locals | Parser rejects parameter names starting with `__` | — |
 | Methods named `clone`, `to_string`, ... resolved to `Arc`'s method in async shims | Shims call `Type::method(&*this, ..)` | — |
 | A panicking `Drop` in `free_*` / stream free / cancel aborted the process | Teardown runs under `guarded_drop` (catch_unwind + Tokio context) | — |

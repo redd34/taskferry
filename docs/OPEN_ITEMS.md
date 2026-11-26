@@ -5,11 +5,11 @@ Status of the four phases and the deliberate deviations from the original spec a
 
 ## Verification gaps
 
-- **W2 — Test on .NET 8.** `TokioDotnet.Runtime` targets `net8.0;net9.0`, but the tests and the AOT
+- **W2 — Test on .NET 8.** `Taskferry.Runtime` targets `net8.0;net9.0`, but the tests and the AOT
   smoke test only run on `net9.0`.
 - **W3 — Compile-fail tests for the macro.** Rejections (self-borrowing streams, `&mut self`,
   unsupported types, reserved parameter names) were checked by hand. Add `trybuild` tests.
-- **W4 — Generator unit tests.** `TokioDotnet.Generator` is only tested end to end through the
+- **W4 — Generator unit tests.** `Taskferry.Generator` is only tested end to end through the
   example crate. Add snapshot tests over hand-written manifests (static methods, unit-returning
   async, name clashes, keyword parameter names).
 - **W5 — Tests without regression coverage.** Several fixes in BUGS.md ("Fixed" table, rows marked —)
@@ -32,13 +32,13 @@ Status of the four phases and the deliberate deviations from the original spec a
 
 ## Packaging
 
-- **P1 — Publish the NuGet packages.** `dotnet pack` produces `TokioDotnet.Runtime` and
-  `TokioDotnet.Generator` (with the MSBuild targets that wire up the manifest and native library),
+- **P1 — Publish the NuGet packages.** `dotnet pack` produces `Taskferry.Runtime` and
+  `Taskferry.Generator` (with the MSBuild targets that wire up the manifest and native library),
   and a package-only consumer was smoke-tested on macOS. Not yet published; see
   [PROMOTION.md](PROMOTION.md). Gaps: cross-compiled `cargo build --target <triple>` output needs
   the profile set to `<triple>/release`; package-only consumption is untested on Linux and Windows.
 - **P2 — Publish to crates.io.** Metadata is in place and `cargo publish --dry-run` passes for
-  `tokio-dotnet-core` and `tokio-dotnet-macros`. Blocked on the name decision.
+  `taskferry-core` and `taskferry-macros`. Blocked on the name decision.
 - **P4 — `tokenizers` 1.0.** The example pins `tokenizers` 0.21; a 1.0 release candidate exists.
 - **P5 — Benchmark baseline.** `FfiBenchmarks.MarshalledByteArray` simulates copy-in/copy-out
   marshalling rather than using a real marshalled P/Invoke.

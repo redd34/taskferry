@@ -699,6 +699,35 @@ dependencies = [
 ]
 
 [[package]]
+name = "taskferry-core"
+version = "0.1.0"
+dependencies = [
+ "futures",
+ "tokio",
+ "tokio-util",
+]
+
+[[package]]
+name = "taskferry-example"
+version = "0.1.0"
+dependencies = [
+ "futures",
+ "taskferry-core",
+ "taskferry-macros",
+ "tokenizers",
+ "tokio",
+]
+
+[[package]]
+name = "taskferry-macros"
+version = "0.1.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.119",
+]
+
+[[package]]
 name = "thiserror"
 version = "2.0.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -759,35 +788,6 @@ checksum = "b52fd3255258d26fac7264ab5a76b53c13367136dc011d3d6ad4f8ed070396a3"
 dependencies = [
  "pin-project-lite",
  "tokio-macros",
-]
-
-[[package]]
-name = "tokio-dotnet-core"
-version = "0.1.0"
-dependencies = [
- "futures",
- "tokio",
- "tokio-util",
-]
-
-[[package]]
-name = "tokio-dotnet-example"
-version = "0.1.0"
-dependencies = [
- "futures",
- "tokenizers",
- "tokio",
- "tokio-dotnet-core",
- "tokio-dotnet-macros",
-]
-
-[[package]]
-name = "tokio-dotnet-macros"
-version = "0.1.0"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.119",
 ]
 
 [[package]]

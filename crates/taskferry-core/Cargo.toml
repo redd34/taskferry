@@ -1,0 +1,15 @@
+[package]
+name = "taskferry-core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+keywords.workspace = true
+categories.workspace = true
+description = "Runtime support for taskferry: C-ABI types, Tokio runtime, and task/stream bridges from async Rust to .NET."
+readme = "../../README.md"
+
+[dependencies]
+tokio.workspace = true
+tokio-util.workspace = true
+futures.workspace = true

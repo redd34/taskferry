@@ -3,7 +3,7 @@
     Quick start, from the repository root (exact commands are in the README):
         cargo build (with the release flag), then
         dotnet run on this project
-    The single TokioDotnetCargoTargetDir property wires up the bindings manifest and
+    The single TaskferryCargoTargetDir property wires up the bindings manifest and
     copies the native library next to the app.
   -->
   <PropertyGroup>
@@ -11,12 +11,12 @@
     <OutputType>Exe</OutputType>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <TokioDotnetCargoTargetDir>../../target</TokioDotnetCargoTargetDir>
+    <TaskferryCargoTargetDir>../../target</TaskferryCargoTargetDir>
   </PropertyGroup>
   <ItemGroup>
     <!-- With the NuGet packages these two lines become PackageReferences and the Import goes away. -->
-    <ProjectReference Include="../../dotnet/TokioDotnet.Runtime/TokioDotnet.Runtime.csproj" />
-    <ProjectReference Include="../../dotnet/TokioDotnet.Generator/TokioDotnet.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="../../dotnet/Taskferry.Runtime/Taskferry.Runtime.csproj" />
+    <ProjectReference Include="../../dotnet/Taskferry.Generator/Taskferry.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
-  <Import Project="../../dotnet/TokioDotnet.Generator/build/TokioDotnet.Generator.targets" />
+  <Import Project="../../dotnet/Taskferry.Generator/build/Taskferry.Generator.targets" />
 </Project>

@@ -48,7 +48,7 @@ flowchart TB
     R8 --> T8["Output_IsTheRustBuffer_AndDisposeFreesIt"]
 ```
 
-## Rust unit tests — `tokio-dotnet-core` (3/3)
+## Rust unit tests — `taskferry-core` (3/3)
 
 | Test | Verifies | Result |
 |---|---|---|
@@ -56,7 +56,7 @@ flowchart TB
 | `task_bridge::tests::dropped_guard_fires_cancelled_once` | A dropped `CompletionGuard` fires the callback exactly once, with a cancelled outcome | Pass |
 | `task_bridge::tests::spawn_resolves_ok_panic_and_cancel` | A spawned future resolves with its value, a panic becomes a panic error, a cancelled token aborts it | Pass |
 
-## .NET tests — `TokioDotnet.Tests` (22/22, 3.2 s)
+## .NET tests — `Taskferry.Tests` (22/22, 3.2 s)
 
 ### ZeroCopyMemoryTests (5/5)
 
@@ -102,7 +102,7 @@ flowchart TB
 
 ## NativeAOT smoke test (1/1)
 
-**Phase 2 gate.** `dotnet/TokioDotnet.AotSmoke` is published with `PublishAot=true` and the native
+**Phase 2 gate.** `dotnet/Taskferry.AotSmoke` is published with `PublishAot=true` and the native
 binary is executed. It exercises a sync call, a string round trip, an async zero-copy call, a
 100-item stream and a caught panic. Result: publish succeeded, binary printed `AOT OK`.
 

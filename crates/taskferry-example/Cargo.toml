@@ -1,0 +1,17 @@
+[package]
+name = "taskferry-example"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+taskferry-core = { path = "../taskferry-core" }
+taskferry-macros = { path = "../taskferry-macros" }
+tokio.workspace = true
+futures.workspace = true
+# Pure-Rust regex backend: no C toolchain needed for cross-platform linking.
+tokenizers = { version = "0.21", default-features = false, features = ["fancy-regex"] }

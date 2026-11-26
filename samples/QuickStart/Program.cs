@@ -1,7 +1,7 @@
-// Calls the Rust `TokenizerEngine` from crates/tokio-dotnet-example (a Hugging Face tokenizer).
+// Calls the Rust `TokenizerEngine` from crates/taskferry-example (a Hugging Face tokenizer).
 using System.Buffers;
 using System.Text;
-using TokioDotnetExample;
+using TaskferryExample;
 
 // A tiny word-level tokenizer definition, in the tokenizer.json format.
 byte[] tokenizerJson = Encoding.UTF8.GetBytes("""
@@ -32,7 +32,7 @@ try
 {
     TokenizerEngine.Create("not a tokenizer"u8);
 }
-catch (TokioDotnet.Runtime.RustFfiException e)
+catch (Taskferry.Runtime.RustFfiException e)
 {
     Console.WriteLine($"Rust error:   {e.Message}");
 }

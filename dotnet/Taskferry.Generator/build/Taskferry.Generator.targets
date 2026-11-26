@@ -1,0 +1,59 @@
+<Project>
+  <!--
+    Wires a cargo build of a #[dotnet_export] crate into a .NET project.
+
+    Set in the consuming project:
+      TaskferryCargoTargetDir  cargo target directory (absolute or relative to the project). Required.
+      TaskferryCargoProfile    target subdirectory holding the cdylib (release, debug, ...). Default: release.
+      TaskferryLibrary         cdylib name(s), semicolon-separated. Default: first "library" in the manifest.
+
+    Then (AllowUnsafeBlocks is set to true, as the generated code needs it):
+      - <target>/taskferry-bindings.json is added to AdditionalFiles for Taskferry.Generator.
+      - <target>/<profile>/lib{name}.dylib | lib{name}.so | {name}.dll is copied to the output and publish
+        directories (including NativeAOT publish).
+  -->
+  <PropertyGroup Condition="'$(TaskferryCargoTargetDir)' != ''">
+    <!-- The generated bindings use pointers (the SDK defaults this to false, so it is forced on). -->
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <TaskferryCargoProfile Condition="'$(TaskferryCargoProfile)' == ''">release</TaskferryCargoProfile>
+    <_TaskferryTargetDir>$([MSBuild]::NormalizeDirectory($(MSBuildProjectDirectory), $(TaskferryCargoTargetDir)))</_TaskferryTargetDir>
+    <_TaskferryManifest>$(_TaskferryTargetDir)taskferry-bindings.json</_TaskferryManifest>
+    <_TaskferryNativeDir>$([MSBuild]::NormalizeDirectory($(_TaskferryTargetDir), $(TaskferryCargoProfile)))</_TaskferryNativeDir>
+    <TaskferryLibrary Condition="'$(TaskferryLibrary)' == '' And Exists('$(_TaskferryManifest)')">$([System.Text.RegularExpressions.Regex]::Match($([System.IO.File]::ReadAllText('$(_TaskferryManifest)')), '"library"\s*:\s*"([^"]+)"').Groups[1].Value)</TaskferryLibrary>
+
+    <!-- Native file naming follows the target RID when set, else the build host. -->
+    <_TaskferryOs Condition="'$(RuntimeIdentifier)' == '' And $([MSBuild]::IsOSPlatform('Windows'))">win</_TaskferryOs>
+    <_TaskferryOs Condition="'$(RuntimeIdentifier)' == '' And $([MSBuild]::IsOSPlatform('OSX'))">osx</_TaskferryOs>
+    <_TaskferryOs Condition="$(RuntimeIdentifier.StartsWith('win'))">win</_TaskferryOs>
+    <_TaskferryOs Condition="$(RuntimeIdentifier.StartsWith('osx'))">osx</_TaskferryOs>
+    <_TaskferryPrefix>lib</_TaskferryPrefix>
+    <_TaskferryPrefix Condition="'$(_TaskferryOs)' == 'win'"></_TaskferryPrefix>
+    <_TaskferrySuffix>.so</_TaskferrySuffix>
+    <_TaskferrySuffix Condition="'$(_TaskferryOs)' == 'win'">.dll</_TaskferrySuffix>
+    <_TaskferrySuffix Condition="'$(_TaskferryOs)' == 'osx'">.dylib</_TaskferrySuffix>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(TaskferryCargoTargetDir)' != ''">
+    <AdditionalFiles Include="$(_TaskferryManifest)" Condition="Exists('$(_TaskferryManifest)')" />
+    <_TaskferryNativeLib Include="$(TaskferryLibrary)" />
+    <_TaskferryNativeFile Include="@(_TaskferryNativeLib->'$(_TaskferryNativeDir)$(_TaskferryPrefix)%(Identity)$(_TaskferrySuffix)')" />
+  </ItemGroup>
+
+  <!-- Before AssignTargetPaths so the copy feeds both the build output and publish (incl. NativeAOT). -->
+  <Target Name="TaskferryNativeLibrary" BeforeTargets="AssignTargetPaths" Condition="'$(TaskferryCargoTargetDir)' != ''">
+    <ItemGroup>
+      <None Include="@(_TaskferryNativeFile)" Condition="Exists('%(_TaskferryNativeFile.Identity)')"
+            Link="%(_TaskferryNativeFile.Filename)%(_TaskferryNativeFile.Extension)" Visible="false"
+            CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    </ItemGroup>
+    <Warning Condition="!Exists('$(_TaskferryManifest)')"
+             Code="TASKFERRY001"
+             Text="taskferry: bindings manifest '$(_TaskferryManifest)' not found, so no bindings will be generated. Run `cargo build --release` (or the cargo profile matching TaskferryCargoProfile) on the #[dotnet_export] crate first, or fix TaskferryCargoTargetDir." />
+    <Warning Condition="Exists('$(_TaskferryManifest)') And '@(_TaskferryNativeFile)' == ''"
+             Code="TASKFERRY002"
+             Text="taskferry: no native library name found. Set TaskferryLibrary to the cdylib name." />
+    <Warning Condition="'@(_TaskferryNativeFile)' != '' And !Exists('%(_TaskferryNativeFile.Identity)')"
+             Code="TASKFERRY002"
+             Text="taskferry: native library '%(_TaskferryNativeFile.Identity)' not found, so it will not be copied to the output. Run `cargo build --release` (or the cargo profile matching TaskferryCargoProfile) first, or fix TaskferryCargoTargetDir / TaskferryCargoProfile / TaskferryLibrary." />
+  </Target>
+</Project>

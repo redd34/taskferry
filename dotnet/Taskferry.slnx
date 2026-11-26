@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="Taskferry.Runtime/Taskferry.Runtime.csproj" />
+  <Project Path="Taskferry.Generator/Taskferry.Generator.csproj" />
+  <Project Path="Taskferry.Tests/Taskferry.Tests.csproj" />
+  <Project Path="Taskferry.AotSmoke/Taskferry.AotSmoke.csproj" />
+  <Project Path="../samples/QuickStart/QuickStart.csproj" />
+</Solution>
