@@ -5,9 +5,6 @@ Status of the four phases and the deliberate deviations from the original spec a
 
 ## Verification gaps
 
-- **W1 — CI on Linux and Windows.** Everything has only been run on macOS arm64. `scripts/verify.sh`
-  has Linux and Windows (Git Bash) branches that have never executed. Add a GitHub Actions matrix
-  (macOS, Ubuntu, Windows) running `./scripts/verify.sh`.
 - **W2 — Test on .NET 8.** `TokioDotnet.Runtime` targets `net8.0;net9.0`, but the tests and the AOT
   smoke test only run on `net9.0`.
 - **W3 — Compile-fail tests for the macro.** Rejections (self-borrowing streams, `&mut self`,
@@ -35,10 +32,13 @@ Status of the four phases and the deliberate deviations from the original spec a
 
 ## Packaging
 
-- **P1 — NuGet packages.** Ship `TokioDotnet.Runtime` and `TokioDotnet.Generator` as packages, with
-  an MSBuild target that adds the manifest to `AdditionalFiles` and copies the native library
-  (today each consumer `.csproj` does this by hand and `verify.sh` copies the cdylib).
-- **P2 — crates.io.** Publish `tokio-dotnet-core` and `tokio-dotnet-macros`; add crate metadata.
+- **P1 — Publish the NuGet packages.** `dotnet pack` produces `TokioDotnet.Runtime` and
+  `TokioDotnet.Generator` (with the MSBuild targets that wire up the manifest and native library),
+  and a package-only consumer was smoke-tested on macOS. Not yet published; see
+  [PROMOTION.md](PROMOTION.md). Gaps: cross-compiled `cargo build --target <triple>` output needs
+  the profile set to `<triple>/release`; package-only consumption is untested on Linux and Windows.
+- **P2 — Publish to crates.io.** Metadata is in place and `cargo publish --dry-run` passes for
+  `tokio-dotnet-core` and `tokio-dotnet-macros`. Blocked on the name decision.
 - **P4 — `tokenizers` 1.0.** The example pins `tokenizers` 0.21; a 1.0 release candidate exists.
 - **P5 — Benchmark baseline.** `FfiBenchmarks.MarshalledByteArray` simulates copy-in/copy-out
   marshalling rather than using a real marshalled P/Invoke.

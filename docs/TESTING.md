@@ -3,7 +3,16 @@
 Last full run: **2026-11-26**, macOS arm64, rustc 1.100.0, .NET SDK 9.0.303 (tests on `net9.0`),
 via `./scripts/verify.sh`. Result: **26 of 26 checks passed**.
 
-Not run: Linux, Windows, .NET 8, 32-bit targets (see [OPEN_ITEMS.md](OPEN_ITEMS.md)).
+The same script runs in CI on every push ([workflow](../.github/workflows/ci.yml)):
+
+| Platform | Rust tests | .NET tests | Quick-start sample | NativeAOT publish + run |
+|---|---|---|---|---|
+| Ubuntu (x64) | Pass | 22/22 | Pass | Pass |
+| macOS (arm64) | Pass | 22/22 | Pass | Pass |
+| Windows (x64) | Pass | 22/22 | Pass | Pass |
+
+Results above are from the CI run on commit `9dd5f3d` (2026-11-26). Not run: .NET 8, 32-bit
+targets (see [OPEN_ITEMS.md](OPEN_ITEMS.md)).
 
 ```mermaid
 pie showData title Checks by area (26 total)

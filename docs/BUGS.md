@@ -31,7 +31,8 @@ panic, and `RustFfiException` contains only the panic message, not the location 
 
 ### B5 — NuGet advisory on the NativeAOT compiler package
 `Microsoft.DotNet.ILCompiler` 9.0.7 (pinned by .NET SDK 9.0.303) is flagged NU1903
-(GHSA-p3jp-9v83-76w9). It is left as a visible warning. **Fix:** update the .NET SDK.
+(GHSA-p3jp-9v83-76w9). It is left as a visible warning. CI installs the current SDK and is not
+affected. **Fix:** update the local .NET SDK.
 
 ### B6 — Only 64-bit layouts are asserted
 The Rust/C# struct layout parity tests are compiled only for 64-bit targets. 32-bit is unverified.

@@ -9,7 +9,7 @@ Tokio futures into `Task<T>` and a Rust `Stream` into `IAsyncEnumerable<T>`, wit
 Annotate Rust with `#[dotnet_export]`; a Roslyn source generator emits the C# bindings at
 compile time. No hand-written P/Invoke, no serialization, no runtime reflection.
 
-> **Status:** experimental. Verified on macOS arm64 only (rustc 1.100, .NET SDK 9.0.303).
+> **Status:** experimental. CI runs the full suite on Linux x64, macOS arm64 and Windows x64.
 > See [docs/BUGS.md](docs/BUGS.md) and [docs/OPEN_ITEMS.md](docs/OPEN_ITEMS.md).
 
 ## Quick start
