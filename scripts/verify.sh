@@ -13,12 +13,16 @@ echo "==> dotnet build + test"
 dotnet build dotnet/TokioDotnet.slnx -c Release --nologo -v quiet
 dotnet test dotnet/TokioDotnet.Tests -c Release --no-build --nologo
 
+echo "==> quick-start sample"
+dotnet run --project samples/QuickStart -c Release --no-build
+
 if [ "${SKIP_AOT:-0}" != 1 ]; then
   echo "==> NativeAOT publish + run"
+  # Not named OS: on Windows that would overwrite the OS=Windows_NT variable MSBuild relies on.
   case "$(uname -s)" in
-    Darwin) OS=osx ;;
-    Linux) OS=linux ;;
-    MINGW* | MSYS* | CYGWIN*) OS=win ;;
+    Darwin) RID_OS=osx ;;
+    Linux) RID_OS=linux ;;
+    MINGW* | MSYS* | CYGWIN*) RID_OS=win ;;
     *) echo "unsupported OS: $(uname -s)" >&2; exit 1 ;;
   esac
   case "$(uname -m)" in
@@ -26,7 +30,7 @@ if [ "${SKIP_AOT:-0}" != 1 ]; then
     *) ARCH=x64 ;;
   esac
   AOT_OUT=target/aot-smoke
-  dotnet publish dotnet/TokioDotnet.AotSmoke -c Release -r "$OS-$ARCH" -o "$AOT_OUT" --nologo -v quiet
+  dotnet publish dotnet/TokioDotnet.AotSmoke -c Release -r "$RID_OS-$ARCH" -o "$AOT_OUT" --nologo -v quiet
   "$AOT_OUT/TokioDotnet.AotSmoke"
 fi
 

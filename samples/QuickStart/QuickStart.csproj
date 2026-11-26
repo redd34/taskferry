@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    Quick start, from the repository root (exact commands are in the README):
+        cargo build (with the release flag), then
+        dotnet run on this project
+    The single TokioDotnetCargoTargetDir property wires up the bindings manifest and
+    copies the native library next to the app.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TokioDotnetCargoTargetDir>../../target</TokioDotnetCargoTargetDir>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- With the NuGet packages these two lines become PackageReferences and the Import goes away. -->
+    <ProjectReference Include="../../dotnet/TokioDotnet.Runtime/TokioDotnet.Runtime.csproj" />
+    <ProjectReference Include="../../dotnet/TokioDotnet.Generator/TokioDotnet.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+  <Import Project="../../dotnet/TokioDotnet.Generator/build/TokioDotnet.Generator.targets" />
+</Project>

@@ -12,6 +12,22 @@ compile time. No hand-written P/Invoke, no serialization, no runtime reflection.
 > **Status:** experimental. Verified on macOS arm64 only (rustc 1.100, .NET SDK 9.0.303).
 > See [docs/BUGS.md](docs/BUGS.md) and [docs/OPEN_ITEMS.md](docs/OPEN_ITEMS.md).
 
+## Quick start
+
+Requires Rust (stable) and the .NET 9 SDK.
+
+```sh
+git clone https://github.com/redd34/rustify && cd rustify
+cargo build --release
+dotnet run --project samples/QuickStart
+```
+
+```text
+EncodeAsync:  [1, 2, 3, 4, 5]
+StreamTokens: 1 3
+Rust error:   expected ident at line 1 column 2
+```
+
 ## Example
 
 Rust:
@@ -116,8 +132,6 @@ Methods take `&self` or no receiver. `T` in slices and vectors is a numeric prim
 
 ## Building and verifying
 
-Requires Rust (stable) and the .NET 9 SDK.
-
 ```sh
 ./scripts/verify.sh            # everything below; SKIP_AOT=1 skips the NativeAOT step
 ./scripts/bench.sh             # BenchmarkDotNet suite
@@ -169,15 +183,26 @@ The baseline simulates classic `byte[]` marshalling (copy to native, call, copy 
 | `dotnet/TokioDotnet.Generator` | Roslyn incremental generator that reads the manifest |
 | `dotnet/TokioDotnet.Tests` | xUnit tests and BenchmarkDotNet benchmarks |
 | `dotnet/TokioDotnet.AotSmoke` | Console app published with NativeAOT by `verify.sh` |
+| `samples/QuickStart` | Minimal console app calling the Rust tokenizer |
 | `docs/` | Test report, open work items, known bugs |
 
 ## Using it in your own project
 
-There are no published packages yet. For now: depend on the two crates by path, build your
-crate as a `cdylib`, then in your `.csproj` reference `TokioDotnet.Runtime`, add
-`TokioDotnet.Generator` as an analyzer, add `target/tokio-dotnet-bindings.json` as
-`AdditionalFiles`, and copy the native library next to your output. `TokioDotnet.Tests.csproj`
-is a working template. The generated namespace is the cdylib name in PascalCase.
+Packages are not published yet (see [docs/PROMOTION.md](docs/PROMOTION.md)). Until then, depend
+on the two crates by path or git, build your crate as a `cdylib`, and in your `.csproj`:
+
+```xml
+<PropertyGroup>
+  <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  <TokioDotnetCargoTargetDir>path/to/your/cargo/target</TokioDotnetCargoTargetDir>
+</PropertyGroup>
+```
+
+plus references to `TokioDotnet.Runtime` and `TokioDotnet.Generator` (as an analyzer) and an
+import of `dotnet/TokioDotnet.Generator/build/TokioDotnet.Generator.targets`. That one property
+adds the bindings manifest to the build and copies the native library next to your output,
+including for `dotnet publish -p:PublishAot=true`. [`samples/QuickStart`](samples/QuickStart) is a
+working template. The generated namespace is the cdylib name in PascalCase.
 
 ## License
 
