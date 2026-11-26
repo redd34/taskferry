@@ -1,0 +1,51 @@
+name: Release
+
+# Publishes to crates.io and NuGet when a version tag (e.g. v0.1.0) is pushed.
+# Requires two repository secrets: CARGO_REGISTRY_TOKEN and NUGET_API_KEY.
+# Publishing is permanent: crates.io versions can be yanked but never deleted.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            9.0.x
+
+      - name: Check the tag matches the crate and package versions
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          crate=$(cargo metadata --no-deps --format-version 1 | python3 -c "import json,sys; print(next(p['version'] for p in json.load(sys.stdin)['packages'] if p['name']=='taskferry-core'))")
+          nuget=$(grep -o '<Version>[^<]*' dotnet/Taskferry.Runtime/Taskferry.Runtime.csproj | cut -d'>' -f2)
+          echo "tag=$tag crate=$crate nuget=$nuget"
+          test "$tag" = "$crate" && test "$tag" = "$nuget"
+
+      - name: Verify (tests, sample, NativeAOT)
+        run: ./scripts/verify.sh
+
+      - name: Pack NuGet packages
+        run: |
+          dotnet pack dotnet/Taskferry.Runtime -c Release -o artifacts/nuget --nologo
+          dotnet pack dotnet/Taskferry.Generator -c Release -o artifacts/nuget --nologo
+
+      - name: Publish crates
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: |
+          cargo publish -p taskferry-core
+          cargo publish -p taskferry-macros
+
+      - name: Publish NuGet packages
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        run: dotnet nuget push "artifacts/nuget/*.nupkg" --api-key "$NUGET_API_KEY" --source https://api.nuget.org/v3/index.json --skip-duplicate

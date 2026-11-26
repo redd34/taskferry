@@ -11,7 +11,7 @@ The same script runs in CI on every push ([workflow](../.github/workflows/ci.yml
 | macOS (arm64) | Pass | 22/22 | Pass | Pass |
 | Windows (x64) | Pass | 22/22 | Pass | Pass |
 
-Results above are from the CI run on commit `9dd5f3d` (2026-11-26). Not run: .NET 8, 32-bit
+Results above are from the CI run on commit `73cd4c1`, after the rename to Taskferry (2026-11-26). Not run: .NET 8, 32-bit
 targets (see [OPEN_ITEMS.md](OPEN_ITEMS.md)).
 
 ```mermaid

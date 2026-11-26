@@ -14,7 +14,22 @@ Legend: ✅ done · 🟡 prepared, waiting on a decision or credential · ⬜ no
 | 1.2 | Crate metadata for crates.io | ✅ | `cargo publish --dry-run` passes for `taskferry-core` and `taskferry-macros` |
 | 1.3 | NuGet packages for runtime and generator | ✅ packable, not published | `dotnet pack` into `artifacts/nuget/` |
 | 1.4 | Decide the name | ✅ | **Taskferry** (crates `taskferry-core`, `taskferry-macros`; packages `Taskferry.Runtime`, `Taskferry.Generator`). See section 5 |
-| 1.5 | Publish to crates.io and NuGet | 🟡 needs API tokens | Irreversible (crates.io versions cannot be deleted); not done without explicit go-ahead |
+| 1.5 | Publish to crates.io and NuGet | 🟡 one step away | `.github/workflows/release.yml` publishes on a `v*` tag. Needs two repository secrets; see below |
+
+### How to publish 0.1.0
+
+Publishing is permanent (a crates.io version can be yanked but never deleted), so it is triggered
+by you, not automatically.
+
+1. Create a crates.io API token (crates.io → Account Settings → API Tokens, scope "publish-new"
+   and "publish-update") and a NuGet API key (nuget.org → API Keys, scope "Push new packages").
+2. Add them to the repository as secrets named `CARGO_REGISTRY_TOKEN` and `NUGET_API_KEY`
+   (GitHub → Settings → Secrets and variables → Actions).
+3. Push a tag: `git tag v0.1.0 && git push origin v0.1.0`.
+
+The release workflow checks that the tag matches the crate and package versions, runs the full
+verification, then publishes `taskferry-core`, `taskferry-macros`, `Taskferry.Runtime` and
+`Taskferry.Generator`. The bare crate name `taskferry` is not published by this and stays unreserved.
 
 ## 2. Make the repository findable
 
